@@ -1,103 +1,95 @@
 import telebot, random, time
 from collections import defaultdict
 from telebot.apihelper import ApiException
-from config import MINIGAME_TOKEN
+from config import MINIGAME_TOKEN 
 
 bot = telebot.TeleBot(MINIGAME_TOKEN)
 
-saveF = defaultdict(dict)
-saveV = defaultdict(dict)
+saveForca = defaultdict(dict)
+saveVelha = defaultdict(dict)
 
 def send_safe(message, text):
     try:
         bot.send_message(message.chat.id, text, timeout=5)
     except ApiException as e:
         if "Too Many Requests" in str(e):
-            time.sleep(5)  # Espera se exceder limite
+            time.sleep(5)
             send_safe(message, text)
 
 # Verificações de mensagem
 
-def verificar_inicio(mensagem):
-    if mensagem is None:
-        return True
-
-def verificar(mensagem):
-    if mensagem.text == 'jogar' or mensagem.text == "/games":
-        return True
-
 def verificar_coordenada(mensagem):
-    if mensagem.text[1] == ",":
+    if len(saveVelha) > 0:
         return True
+
 
 def verificar_chute(mensagem):
-    if len(saveF) > 0:
+    if len(saveForca) > 0:
         return True
 
 
 # Mensagens iniciais
-
-inicio = """🤖Bem vindo ao Bot de Mini Games PVE🤖
-          🕹️Escreva 'jogar' para iniciar🕹️  """
+menu ="""🤖Bem vindo ao Bot de Mini Games PVE🤖
+🕹️Escolha o jogo que deseja jogar🕹️:
+/forca
+/velha"""
 @bot.message_handler(commands=["start"])
-def reponderInicio(mensagem):
-    bot.send_message(mensagem.chat.id, inicio, timeout=5)
-
-
-menu ="""🎮Escolha o jogo que deseja jogar🎮:
-        /forca
-        /velha"""
-@bot.message_handler(func=verificar)
 def reponderMenu(mensagem):
-    bot.send_message(mensagem.chat.id, menu, timeout=5)
+    send_safe(mensagem, menu)
 
 
 # Forca
-
+lista_chutes = []
 @bot.message_handler(func=verificar_chute)
 def chute_usuario(mensagem):
-    resposta = receber_chute(mensagem)
+    chute = mensagem.text.strip().lower()
+
+    if len(chute) != 1:
+        send_safe(mensagem, "Por favor, digite apenas uma letra.")
+        return 
+    elif not chute.isalpha():
+        send_safe(mensagem, "Por favor, digite uma letra")
+        return
+    elif chute in lista_chutes:
+        send_safe(mensagem, "Você já chutou essa letra, tente outra.")
+        return
+    
+    lista_chutes.append(chute)
+    resposta = receber_chute(mensagem, chute)
     send_safe(mensagem, resposta)
-    # bot.send_message(mensagem.chat.id, resposta, timeout=5)
 
 
-opcoes_senhas = ['python', 'assembly', 'github', 'programaçao', 'Alan Turing', 'estagiario', 'desenvolvedor', 'javascript', 'telegram', ]
+opcoes_senhas = ['python', 'assembly', 'github', 'programaçao', 'Alan Turing', 'estagiario', 'desenvolvedor', 'telegram', ]
 @bot.message_handler(commands=["forca"])
 def jogarForca(mensagem):
     chat_id = mensagem.chat.id
     senha = opcoes_senhas[random.randrange(len(opcoes_senhas))]
-    saveF.pop(chat_id, print('Save não encontrado'))
+    saveForca.pop(chat_id, print('Save não encontrado'))
     
-    saveF[chat_id] = {
+    saveForca[chat_id] = {
         'senha': senha,
         'acertadas': '',
         'erros': 0,
         'senha_oculta': '_' * len(senha)
     }
-    saveF[chat_id]['erros'] = 0
+    saveForca[chat_id]['erros'] = 0
     bot.send_message(chat_id, (
         "Bem-vindo ao jogo da forca!\n"
-        f"Senha: {saveF[chat_id]['senha_oculta']}\n"
+        f"Senha: {saveForca[chat_id]['senha_oculta']}\n"
         "Digite uma letra para começar."
         ),
         timeout=5
         )
 
-def receber_chute(mensagem):
-        chat_id = mensagem.chat.id
-        chute = mensagem.text.strip().lower()
 
-        if chat_id not in saveF:
-            bot.send_message(chat_id, "Digite /forca para iniciar um novo jogo.", timeout=5)
+def receber_chute(mensagem, chute):
+        chat_id = mensagem.chat.id
+
+        if chat_id not in saveForca:
+            send_safe(mensagem, "Digite /forca para iniciar um novo jogo.")
             return
 
-        saveF_atual = saveF[chat_id]
-
-        if len(chute) != 1 or not chute.isalpha():
-            bot.send_message(chat_id, "Por favor, digite apenas uma letra.", timeout=5)
-
-        if chute in saveF_atual['acertadas']:
-            bot.send_message(chat_id, "Você já chutou essa letra. Tente outra.", timeout=5)
+        saveF_atual = saveForca[chat_id]
 
         if chute in saveF_atual['senha']:
             saveF_atual['acertadas'] += chute
@@ -119,12 +111,13 @@ def receber_chute(mensagem):
         resposta += f"Senha: {senha_oculta}"
 
         if saveF_atual['senha_oculta'] == saveF_atual['senha']:
-            resposta += "\nParabéns! Você acertou a senha secreta."
-            saveF.pop(chat_id, print('Save não encontrado'))
+            resposta += "\nParabéns, você acertou a senha secreta!\nUse /forca para iniciar um novo jogo."
+            saveForca.pop(chat_id, print('Save não encontrado'))
         elif saveF_atual['erros'] == 6:
             resposta += f"\nVocê perdeu. A senha era: {saveF_atual['senha']}"
-            saveF.pop(chat_id, print('Save não encontrado')) 
+            saveForca.pop(chat_id, print('Save não encontrado')) 
         return resposta
+
 
 def desenhar_forca(erros):
         partes = [
@@ -161,61 +154,54 @@ def exibirJogo(jogo):
     return tabuleiro
 
 
-def zerarJogo(jogo, listaX, listaO):
-    for i in range(3):
-        for j in range(3):
-            jogo[i][j] = ""
-            
-    listaX.clear()
-    listaO.clear()
-
-
 @bot.message_handler(commands=["velha"])
 def jogarVelha(mensagem):
     chat_id = mensagem.chat.id
     inicio = exibirJogo(jogo)
+    saveVelha.pop(chat_id, print("Save velha não encontrado"))
+    print("Save velha apagado")
 
     send_safe(mensagem,
         "===Bem-vindo ao jogo da velha!===\n" +
-        "Escreva onde desejar jogar(linha, coluna):\n" +
+        "Escolha onde desejar jogar(linha, coluna):\n"
         f"{inicio}"
         )
     
-    # bot.send_message(chat_id, (
-    #     "===Bem-vindo ao jogo da velha!===\n" +
-    #     "Escreva onde desejar jogar(linha, coluna):\n" +
-    #     f"{inicio}"
-    #     ),
-    #     timeout=5
-    #     )
+    saveVelha[chat_id] = {
+        'jogando': 1
+    }
+    print("Save velha criado")
 
 
 @bot.message_handler(func=verificar_coordenada)
 def marcarUsuario(mensagem):
-    if not verificar_coordenada(mensagem):
-        return
+    try:
+        coordenada = mensagem.text.replace(",", "")
 
-    chat_id = mensagem.chat.id
-    deuVelha(chat_id)
-    coordenada = mensagem.text.strip(",")
-    linha = int(coordenada[0])
-    coluna = int(coordenada[2])
-    if getPosicao(linha, coluna) == "X" or getPosicao(linha, coluna) == "O":
-        send_safe(mensagem, "Casa ocupada, joque novamente")
-        # bot.send_message(chat_id, "Casa ocupada, jogue novamente.", timeout=5)
-        return
-    else:
-        jogo[linha-1][coluna-1] = "X"
+        chat_id = mensagem.chat.id
+        if deuVelha(chat_id):
+            return
+        linha = int(coordenada[0])
+        coluna = int(coordenada[1])
+        if getPosicao(linha, coluna) == "X" or getPosicao(linha, coluna) == "O":
+            send_safe(mensagem, "Casa ocupada, joque novamente")
+            return
+        else:
+            jogo[linha-1][coluna-1] = "X"
 
-    send_safe(mensagem, exibirJogo(jogo))
-    # bot.send_message(chat_id, exibirJogo(jogo), timeout=5)
+        send_safe(mensagem, exibirJogo(jogo))
 
-    if xVenceu():
-        zerarJogo(jogo, listaX, listaO)
-        send_safe(mensagem, "Parabéns, você venceu!")
-        # bot.send_message(chat_id, "Parabéns, você venceu!", timeout=5)
-    else: 
-        marcarBot(chat_id)
+        if xVenceu():
+            zerarJogo(jogo, listaX, listaO)
+            send_safe(mensagem, "Parabéns, você venceu!\nUse /velha para jogar novamente.")
+        else:
+            if deuVelha(chat_id) == False:
+                marcarBot(chat_id)
+        
+    except ValueError:
+        send_safe(mensagem, "As linhas e colunas devem ser números, tente novamente.")
+    except IndexError:
+        send_safe(mensagem, "Linha ou coluna inexistentes, tente novamente.")
 
 
 def marcarBot(chat_id):
@@ -231,7 +217,7 @@ def marcarBot(chat_id):
 
     if oVenceu():
         zerarJogo(jogo, listaX, listaO)
-        bot.send_message(chat_id, "Você perdeu, tente novamente.", timeout=5)
+        bot.send_message(chat_id, "Você perdeu.\nUse /velha para jogar novamente", timeout=5)
 
 
 def getPosicao(linha, coluna):
@@ -271,7 +257,6 @@ def oVenceu():
         for j in range(1,4):
             if getPosicao(i,j) == "O":
                 listaO.append([i,j])
-
     for combinacao in venceu:
         o_ganhou = True
         for pos in combinacao:
@@ -288,8 +273,20 @@ def deuVelha(chat_id):
         for casa in linha:
             if casa != "X" and casa != "O":
                 casas_vazias += 1
+
     if casas_vazias == 0:
-        bot.send_message(chat_id, "Deu velha, ninguém ganhou.", timeout=5)
+        bot.send_message(chat_id, "Deu velha, ninguém ganhou.\nUse /velha para jogar novamente", timeout=5)
         zerarJogo(jogo, listaX, listaO)
+        return True
+    
+    return False
+
+
+def zerarJogo(jogo, listaX, listaO):
+    for i in range(3):
+        for j in range(3):
+            jogo[i][j] = ""       
+    listaX.clear()
+    listaO.clear()
 
 bot.polling()
