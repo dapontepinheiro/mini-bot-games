@@ -1,7 +1,9 @@
 import telebot, random, time
 from collections import defaultdict
 from telebot.apihelper import ApiException
-from config import MINIGAME_TOKEN 
+import os
+
+MINIGAME_TOKEN = os.environ["MINIGAME_TOKEN"]
 
 bot = telebot.TeleBot(MINIGAME_TOKEN)
 
