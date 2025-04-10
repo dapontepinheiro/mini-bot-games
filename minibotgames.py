@@ -66,7 +66,8 @@ opcoes_senhas = ['python', 'assembly', 'github', 'programaçao', 'Alan Turing', 
 def jogarForca(mensagem):
     chat_id = mensagem.chat.id
     senha = opcoes_senhas[random.randrange(len(opcoes_senhas))]
-    saveForca.pop(chat_id, print('Save não encontrado'))
+    saveForca.clear()
+    lista_chutes.clear()
     
     saveForca[chat_id] = {
         'senha': senha,
@@ -74,7 +75,7 @@ def jogarForca(mensagem):
         'erros': 0,
         'senha_oculta': '_' * len(senha)
     }
-    saveForca[chat_id]['erros'] = 0
+
     bot.send_message(chat_id, (
         "Bem-vindo ao jogo da forca!\n"
         f"Senha: {saveForca[chat_id]['senha_oculta']}\n"
