@@ -402,6 +402,7 @@ def posicao_valida(linha, coluna, tamanho, direcao, campo):
 @bot.message_handler(commands=['batalha'])
 def jogar_batalha_naval(mensagem):
     chat_id = mensagem.chat.id
+    save_batalha.clear()
     save_batalha[chat_id] = {
         "Peças jogadas": [],
         "Jogadas": [],
@@ -558,8 +559,10 @@ def ataque_inimigo(mensagem):
     barcos_atingidos()
     if venceu():
         send_safe(mensagem, "Você venceu! Use /batalha para jogar novamente.")
+        save_batalha.clear()
     elif perdeu():
         send_safe(mensagem, "Você perdeu. Use /batalha para jogar novamente.")
+        save_batalha.clear()
     else:    
         bot.send_message(chat_id, f"""
                 Tabuleiro Inimigo\n`{tabuleiro_inimigo()}`
