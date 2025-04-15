@@ -6,6 +6,8 @@ Jogo da Velha - Desafie o bot no clássico jogo da velha
 
 Forca - Adivinhe a palavra secreta antes de ser enforcado
 
+Batalha Naval - Trave uma batalha naval contra o bot e tente afundar seus navios
+
 ## 🚀 Como Usar
 Procure por @MiniBotGames no Telegram
 
@@ -22,3 +24,4 @@ Escolha um jogo e divirta-se!
 
 /velha - Inicia um novo jogo da velha
 
+/batalha - Inicia um novo jogo de batalha naval
