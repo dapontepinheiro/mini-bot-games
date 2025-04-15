@@ -561,10 +561,10 @@ def ataque_inimigo(mensagem):
     
     ataques_inimigo.append([linha, coluna])
     barcos_atingidos()
-    if venceu():
+    if venceuBatalha():
         send_safe(mensagem, "Você venceu! Use /batalha para jogar novamente.")
         save_batalha.clear()
-    elif perdeu():
+    elif perdeuBatalha():
         send_safe(mensagem, "Você perdeu. Use /batalha para jogar novamente.")
         save_batalha.clear()
     else:    
@@ -628,14 +628,14 @@ def barcos_atingidos():
         ...
 
 
-def venceu():
+def venceuBatalha():
     if len(navios_inimigo) == 0:
         return True
     else:
         return False
 
 
-def perdeu():
+def perdeuBatalha():
     if len(navios_usuario) == 0:
         return True
     else:
