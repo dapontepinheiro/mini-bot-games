@@ -84,7 +84,7 @@ def jogar_forca(mensagem):
     senha = opcoes_senhas[random.randrange(len(opcoes_senhas))]
     save_forca.clear()
     save_velha.clear()
-    save_batalha.celar()
+    save_batalha.clear()
     lista_chutes.clear()
 
     save_forca[chat_id] = {
