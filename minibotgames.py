@@ -23,12 +23,12 @@ save_batalha = defaultdict(dict)
 # Verificações de mensagem
 
 def verificar_casa(mensagem):
-    if len(save_velha) > 0:
+    if len(save_velha[mensagem.chat.id]) > 0:
         return True
 
 
 def verificar_chute(mensagem):
-    if len(save_forca) > 0:
+    if len(save_forca[mensagem.chat.id]) > 0:
         return True
     
 def verificar_preencher(mensagem):
