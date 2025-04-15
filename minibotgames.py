@@ -83,6 +83,8 @@ def jogar_forca(mensagem):
     chat_id = mensagem.chat.id
     senha = opcoes_senhas[random.randrange(len(opcoes_senhas))]
     save_forca.clear()
+    save_velha.clear()
+    save_batalha.celar()
     lista_chutes.clear()
 
     save_forca[chat_id] = {
@@ -189,7 +191,9 @@ def exibir_jogo(jogo):
 def jogar_velha(mensagem):
     chat_id = mensagem.chat.id
     inicio = exibir_jogo(jogo)
-    save_velha.pop(chat_id, print("Save velha não encontrado"))
+    save_velha.clear()
+    save_forca.clear()
+    save_batalha.clear()
 
     send_safe(mensagem,
         "===Bem-vindo ao jogo da velha!===\n" +
