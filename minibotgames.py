@@ -131,11 +131,11 @@ def receber_chute(mensagem, chute):
 
         if saveF_atual['senha_oculta'] == saveF_atual['senha']:
             resposta += "\nParabéns, você acertou a senha secreta!\nUse /forca para iniciar um novo jogo."
-            del save_forca
+            save_forca.clear()
 
         elif saveF_atual['erros'] == 6:
             resposta += f"\nVocê perdeu. A senha era: {saveF_atual['senha']}"
-            del save_forca
+            save_forca.clear()
 
         return resposta
 
@@ -227,6 +227,7 @@ def marcar_usuario(mensagem):
         if xVenceu():
             zerarJogo(jogo, listaX, listaO)
             send_safe(mensagem, "Parabéns, você venceu!\nUse /velha para jogar novamente.")
+            save_velha.clear()
         else:
             if deuVelha(chat_id) == False:
                 marcar_bot(mensagem)
@@ -252,6 +253,7 @@ def marcar_bot(mensagem):
     if oVenceu():
         zerarJogo(jogo, listaX, listaO)
         send_safe(mensagem, "Você perdeu.\nUse /velha para jogar novamente")
+        save_velha.clear()
 
 
 def get_posicao(linha, coluna):
