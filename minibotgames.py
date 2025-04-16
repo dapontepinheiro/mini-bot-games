@@ -131,11 +131,11 @@ def receber_chute(mensagem, chute):
 
         if saveF_atual['senha_oculta'] == saveF_atual['senha']:
             resposta += "\nParabéns, você acertou a senha secreta!\nUse /forca para iniciar um novo jogo."
-            save_forca.clear()
+            del save_forca
 
         elif saveF_atual['erros'] == 6:
             resposta += f"\nVocê perdeu. A senha era: {saveF_atual['senha']}"
-            save_forca.clear()
+            del save_forca
 
         return resposta
 
