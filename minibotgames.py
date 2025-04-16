@@ -409,11 +409,14 @@ def posicao_valida(linha, coluna, tamanho, direcao, campo):
 def jogar_batalha_naval(mensagem):
     chat_id = mensagem.chat.id
     campo_usuario = [
-    ["" for _ in range(8)] for _ in range(8)
+    ["" for _ in range(8)] for _ in range(8)]
     ]
-campo_inimigo = [
-    ["" for _ in range(8)] for _ in range(8)
+    campo_inimigo = [
+    ["" for _ in range(8)] for _ in range(8)]
     ]
+    save_batalha.clear()
+    save_forca.clear()
+    save_velha.clear()
     save_batalha[chat_id] = {
         "Peças jogadas": [],
         "Jogadas": [],
