@@ -414,7 +414,6 @@ def jogar_batalha_naval(mensagem):
 campo_inimigo = [
     ["" for _ in range(8)] for _ in range(8)
     ]
-    save_batalha.clear()
     save_forca.clear()
     save_velha.clear()
     save_batalha[chat_id] = {
